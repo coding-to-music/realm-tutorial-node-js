@@ -481,6 +481,55 @@ node index.js
 
 Your terminal window will clear and you will see the initial menu prompting you to log in or register as a new user:
 
+### This is what I am seeing
+
+```java
+11 moderate severity vulnerabilities
+
+8888888b.                   888                    88888888888                888
+888   Y88b                  888                        888                    888
+888    888                  888                        888                    888
+888   d88P .d88b.   8888b.  888 88888b.d88b.           888   8888b.  .d8888b  888  888 .d8888b
+8888888P" d8P  Y8b     "88b 888 888 "888 "88b          888      "88b 88K      888 .88P 88K
+888 T88b  88888888 .d888888 888 888  888  888          888  .d888888 "Y8888b. 888888K  "Y8888b.
+888  T88b Y8b.     888  888 888 888  888  888          888  888  888      X88 888 "88b      X88
+888   T88b "Y8888  "Y888888 888 888  888  888          888  "Y888888  88888P' 888  888  88888P'
+
+
+
+
+*** WELCOME ***
+
+
+Please log in to your Realm account or register as a new user.
+
+? What do you want to do? Register as a new user
+
+WELCOME, NEW USER
+
+? Email: second@example.com
+? Password: *****
+
+ ❗
+email must be of type 'string', got ([object Object])
+ ❗
+
+
+WELCOME, NEW USER
+
+? Email: first@example.com
+? Password: *****
+
+ ❗
+email must be of type 'string', got ([object Object])
+ ❗
+
+
+WELCOME, NEW USER
+
+? Email:
+```
+
 ### Initial menu
 
 If the app builds successfully, here are some things you can try in the app:
