@@ -56,8 +56,12 @@ exports.createTask = async (partition) => {
     ]);
     let result;
     realm.write(() => {
-      //TODO: Call the create() Realm function and pass in all of the required properties.
-
+      result = realm.create("Task", {
+        _id: new bson.ObjectID(),
+        _partition: partition,
+        name: task.name,
+        status: task.status.replace(/\s/g, ""), // Removes space from "In Progress",
+      });
     });
 
     output.header("New task created");
@@ -84,11 +88,9 @@ exports.deleteTask = async (partition) => {
   ]);
 
   if (answers.confirm) {
-    //TODO: Call the objectForPrimaryKey() method to get a task by its ID and assign it to task.
-    let task;
+    let task = realm.objectForPrimaryKey("Task", new bson.ObjectID(answers.id));
     realm.write(() => {
-      //TODO: Call the delete() function.
-
+      realm.delete(task);
       output.result("Task deleted.");
     });
     return;
@@ -149,8 +151,8 @@ async function modifyTask(answers, partition) {
   let task;
   try {
     realm.write(() => {
-      //TODO: Call the objectForPrimaryKey() method to get the task by ID and
-      //change the task object's status.
+      task = realm.objectForPrimaryKey("Task", new bson.ObjectID(answers.id));
+      task[answers.key] = answers.value;
     });
     return JSON.stringify(task, null, 2);
   } catch (err) {

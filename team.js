@@ -6,8 +6,7 @@ const users = require("./users");
 exports.getTeamMembers = async () => {
   const currentUser = users.getAuthedUser();
   try {
-    //TODO: call the getMyTeamMembers() Realm function
-
+    const teamMembers = await currentUser.functions.getMyTeamMembers();
     output.result(JSON.stringify(teamMembers, null, 2));
   } catch (err) {
     output.error(err.message);
@@ -25,7 +24,7 @@ exports.addTeamMember = async () => {
         message: "What is the new team member's email address?",
       },
     ]);
-    //TODO: call the addTeamMember() Realm function
+    await currentUser.functions.addTeamMember(email);
 
     output.result("The user was added to your team.");
   } catch (err) {
@@ -47,7 +46,9 @@ exports.removeTeamMember = async () => {
         choices: [...teamMemberNames, new inquirer.Separator()],
       },
     ]);
-    //TODO: call the removeTeamMember() Realm function
+    let result = await currentUser.functions.removeTeamMember(
+      selectedTeamMember
+    );
 
     output.result("The user was removed from your team.");
   } catch (err) {

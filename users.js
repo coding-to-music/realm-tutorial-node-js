@@ -19,7 +19,6 @@ const app = new Realm.App(appConfig);
 */
 Realm.App.Sync.setLogLevel(app, "error");
 
-
 async function logIn() {
   const input = await inquirer.prompt([
     {
@@ -37,10 +36,15 @@ async function logIn() {
 
   try {
     // TODO: create new emailPassword credentials and assign it to ``credentials``
-    const credentials;
+    // const credentials;
 
     // TODO: call the app.logIn() method and assign its value to ``user``
-    const user;
+    // const user;
+    const credentials = Realm.Credentials.emailPassword(
+      input.email,
+      input.password
+    );
+    const user = await app.logIn(credentials);
 
     if (user) {
       output.result("You have successfully logged in as " + app.currentUser.id);

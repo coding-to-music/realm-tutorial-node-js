@@ -23,10 +23,10 @@ This repo is automatically derived from our main docs repo. If you'd like to
 submit a pull request -- thanks! -- please feel free to do so at
 https://github.com/mongodb/docs-realm/ (see the tutorial/ subdirectory).
 
-
 Node.js CLI Tutorialicons/link.png
 
 # Overview
+
 In this tutorial, you will use Node.js to create a task tracker command line interface (CLI) that allows users to:
 
 - Register themselves with email and password.
@@ -42,14 +42,16 @@ Check Out the Quick Start
 If you prefer to explore on your own rather than follow a guided tutorial, check out the Quick Start. It includes copyable code examples and the essential information that you need to set up a MongoDB Realm application.
 
 ## Prerequisites
+
 Before you begin, ensure you have:
 
 - Node.js installed.
-- Set up the backend.
+- Set up the backend. https://docs.mongodb.com/realm/tutorial/realm-app/#std-label-tutorial-task-tracker-create-realm-app
 
 Once you're set up with these prerequisites, you're ready to start the tutorial.
 
 ## A. Clone the Client App Repository
+
 We've already put together a task tracker CLI application that has most of the code you'll need. You can clone the client application repository directly from GitHub:
 
 ```java
@@ -67,10 +69,11 @@ npm install
 ```
 
 ## B. Explore the App Structure & Components
+
 This application has a flat project structure: all of the files are in the root directory. Open a text editor to explore the directory and files. In this tutorial, we'll be focusing on 5 files: config.js, users.js, tasks.js, team.js, projects.js. The other files provide the underlying structure for the CLI. The following table describes the role of important files in this project:
 
 ```java
-- File        Purpose   
+- File        Purpose
 - config.js   Provides a single location for configuration data. You will put your Realm app ID here.
 - index.js    The entry point for the app. Creates the Realm App that you app will use throughout its lifecycle and displays the initial logon screen.
 - main.js     Displays the main menu of choices. Users can view a list of projects they are a member of or select a project.
@@ -83,6 +86,7 @@ This application has a flat project structure: all of the files are in the root 
 ```
 
 ## C. Connect to Your MongoDB Realm App
+
 To get the app working with your backend, you first need to add your Realm App ID to the config.js file. The config.js module exports a single property, realmAppId, which is currently set to "TODO":
 
 ```java
@@ -123,6 +127,7 @@ async function getRealm(partitionKey) {
 At this point, your app is pointing to your backend and opens a connection to it when you start the app. However, users cannot log in yet, so let's update that code next.
 
 ## D. Enable authentication
+
 In the users.js file, we have a logIn function that prompts the user for an email address and password, and then, within a try-catch block, creates an emailPassword credential and passes it to the Realm logIn() method.
 
 Find the the logIn function and add the following code to create a emailPassword credential and call the logIn() method.
@@ -163,6 +168,7 @@ async function logIn() {
 ```
 
 ## E. Define the Object Schemas
+
 In order to model data in the database, we need to define some schemas for the data we store. In schemas.js:
 
 ### TaskSchema
@@ -214,6 +220,7 @@ const ProjectSchema = {
 ```
 
 ## F. Implement the CRUD methods
+
 In the tasks.js and projects.js files, there are a number of functions to handle typical CRUD functionality: getTasks, getTask, createTask, deleteTask, editTask, changeStatus, and getProjects. Each of these functions (except getTasks and getProjects) prompts the user for input and then makes the appropriate call to Realm. Your job is to implement the calls to Realm. The following list provides guidance on how to complete this task for each function.
 
 In tasks.js:
@@ -388,6 +395,7 @@ The backend is set up so that every user has read-only access to their own custo
 By managing the custom user data object entirely on the backend and only providing read-only access on the client side, we prevent a malicious client from granting themselves arbitrary permissions.
 
 ## G. Use Realm Functions
+
 In the team.js file, there are functions that rely on Realm functions. Realm functions allow you to execute server-side logic for your client applications. Each of the following functions require you to implement the calls to Realm.
 
 ### getTeamMembers
@@ -460,6 +468,7 @@ exports.removeTeamMember = async () => {
 ```
 
 ## H. Run and Test
+
 Once you have completed the code, you should run the app and check functionality.
 
 Open a terminal window and change to your app's directory.
@@ -473,6 +482,7 @@ node index.js
 Your terminal window will clear and you will see the initial menu prompting you to log in or register as a new user:
 
 ### Initial menu
+
 If the app builds successfully, here are some things you can try in the app:
 
 - Create a user with email first@example.com
@@ -491,6 +501,7 @@ TIP
 If something isn't working for you, you can check out the final branch of this repo to compare your code with our finished solution.
 
 ## What's Next?
+
 You just built a functional task tracker web application built with MongoDB Realm. Great job!
 
 Now that you have some hands-on experience with MongoDB Realm, consider these options to keep practicing and learn more:
@@ -504,9 +515,9 @@ Now that you have some hands-on experience with MongoDB Realm, consider these op
   - Android (Kotlin)
   - React Native (JavaScript)
   - Web with React and GraphQL (Javascript)
+
 - Dive deeper into the docs to learn more about MongoDB Realm. You'll find information and guides on features like:
 
   - Serverless functions that handle backend logic and connect your app to external services. You can call functions from a client app, either directly or as a custom GraphQL resolver.
   - Triggers and HTTPS Endpoints, which automatically call functions in response to events as they occur. You can define database triggers which respond to changes in your data, authentication triggers which respond to user management and authentication events, and scheduled triggers which run on a fixed schedule.
   - Built-in authentication providers and and user management tools. You can allow users to log in through multiple methods, like API keys and Google OAuth, and associate custom data with every user.
-
