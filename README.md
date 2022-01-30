@@ -62,38 +62,32 @@ The start branch is an incomplete version of the app that we will complete in th
 
 In your terminal, run the following command to install its dependencies:
 
+```java
 npm install
+```
 
 ## B. Explore the App Structure & Components
 This application has a flat project structure: all of the files are in the root directory. Open a text editor to explore the directory and files. In this tutorial, we'll be focusing on 5 files: config.js, users.js, tasks.js, team.js, projects.js. The other files provide the underlying structure for the CLI. The following table describes the role of important files in this project:
 
 ```java
-File
-Purpose
-config.js
-Provides a single location for configuration data. You will put your Realm app ID here.
-index.js
-The entry point for the app. Creates the Realm App that you app will use throughout its lifecycle and displays the initial logon screen.
-main.js
-Displays the main menu of choices. Users can view a list of projects they are a member of or select a project.
-output.js
-Responsible for displaying text in the terminal window.
-tasks.js
-Handles all task-related communication between the CLI and Realm. The methods for listing, creating, editing, and deleting tasks live here.
-schemas.js
-Contains the schema definitions for the collections used in this project.
-users.js
-Handles Realm user authentication, including logging in, registering a new user, and logging out.
-team.js
-Handles the team member related communication between the CLI and Realm. The methods for listing, adding, and removing team members are contained in this file.
-projects.js
-Handles project retrieval and listing.
+- File        Purpose   
+- config.js   Provides a single location for configuration data. You will put your Realm app ID here.
+- index.js    The entry point for the app. Creates the Realm App that you app will use throughout its lifecycle and displays the initial logon screen.
+- main.js     Displays the main menu of choices. Users can view a list of projects they are a member of or select a project.
+- output.js   Responsible for displaying text in the terminal window.
+- tasks.js    Handles all task-related communication between the CLI and Realm. The methods for listing, creating, editing, and deleting tasks live here.
+- schemas.js  Contains the schema definitions for the collections used in this project.
+- users.js    Handles Realm user authentication, including logging in, registering a new user, and logging out.
+- team.js     Handles the team member related communication between the CLI and Realm. The methods for listing, adding, and removing team members are contained in this file.
+- projects.js Handles project retrieval and listing.
 ```
 
 ## C. Connect to Your MongoDB Realm App
 To get the app working with your backend, you first need to add your Realm App ID to the config.js file. The config.js module exports a single property, realmAppId, which is currently set to "TODO":
 
+```java
 exports.realmAppId = "<your Realm app ID here>";
+```
 
 Change this value to your Realm App ID.
 
@@ -102,6 +96,7 @@ To learn how to find your MongoDB Realm appId, see the Find Your App Id doc.
 
 Once you have made that change, you now need to complete the code needed to open a realm. In index.js, find the openRealm function. Replace the TODO line with a line of code that opens a realm and assigns it to the realm property. It will look like this:
 
+```java
 async function openRealm(partitionKey) {
   const config = {
     schema: [schemas.TaskSchema, schemas.UserSchema, schemas.ProjectSchema],
@@ -112,15 +107,18 @@ async function openRealm(partitionKey) {
   };
   return Realm.open(config);
 }
+```
 
 Now that you have implemented the openRealm function, you will now need to complete the code that retrieves the realm. In index.js, find the getRealm function. It will look like this:
 
+```java
 async function getRealm(partitionKey) {
   if (realms[partitionKey] == undefined) {
     realms[partitionKey] = openRealm(partitionKey);
   }
   return realms[partitionKey];
 }
+```
 
 At this point, your app is pointing to your backend and opens a connection to it when you start the app. However, users cannot log in yet, so let's update that code next.
 
@@ -129,6 +127,7 @@ In the users.js file, we have a logIn function that prompts the user for an emai
 
 Find the the logIn function and add the following code to create a emailPassword credential and call the logIn() method.
 
+```java
 async function logIn() {
   const input = await inquirer.prompt([
     {
@@ -161,14 +160,16 @@ async function logIn() {
     return logIn();
   }
 }
+```
 
 ## E. Define the Object Schemas
 In order to model data in the database, we need to define some schemas for the data we store. In schemas.js:
 
-TaskSchema
+### TaskSchema
 
 The task model contains information about a user's tasks. Find the TaskSchema code and replace it with the following:
 
+```java
 const TaskSchema = {
   name: "Task",
   properties: {
@@ -179,11 +180,13 @@ const TaskSchema = {
   },
   primaryKey: "_id",
 };
+```
 
-UserSchema
+### UserSchema
 
 The user model represents a user and their permissions. Find the UserSchema code and replace it with the following:
 
+```java
 const UserSchema = {
   name: "User",
   properties: {
@@ -193,11 +196,13 @@ const UserSchema = {
   },
   primaryKey: "_id",
 };
+```
 
-ProjectSchema
+### ProjectSchema
 
 We also need a project model to represent the projects a user is a member of. Find the ProjectSchema code and replace it with the following:
 
+```java
 const ProjectSchema = {
   name: "Project",
   embedded: true,
@@ -206,27 +211,31 @@ const ProjectSchema = {
     partition: "string?",
   },
 };
+```
 
 ## F. Implement the CRUD methods
 In the tasks.js and projects.js files, there are a number of functions to handle typical CRUD functionality: getTasks, getTask, createTask, deleteTask, editTask, changeStatus, and getProjects. Each of these functions (except getTasks and getProjects) prompts the user for input and then makes the appropriate call to Realm. Your job is to implement the calls to Realm. The following list provides guidance on how to complete this task for each function.
 
 In tasks.js:
 
-getTasks
+### getTasks
 
 To get all objects, call the objects() method and pass in the name of the collection:
 
+```java
 exports.getTasks = async (partition) => {
   const realm = await index.getRealm(partition);
   const tasks = realm.objects("Task");
   output.header("MY TASKS:");
   output.result(JSON.stringify(tasks, null, 2));
 };
+```
 
-getTask
+### getTask
 
 In the Tasks collection, a task's id field is the primary key, so we call the objectForPrimaryKey() function to get a task by its Id.
 
+```java
 exports.getTask = async (partition) => {
   const realm = await index.getRealm(partition);
   try {
@@ -246,11 +255,13 @@ exports.getTask = async (partition) => {
     output.error(err.message);
   }
 };
+```
 
-createTask
+### createTask
 
 Whenever we modify an object in realm, we must do so within a transaction. The write() method takes care of transaction handling for us. So, within the write function, we call the create() function, passing in all of the required properties:
 
+```java
 exports.createTask = async (partition) => {
   const realm = await index.getRealm(partition);
   try {
@@ -286,14 +297,16 @@ exports.createTask = async (partition) => {
     output.error(err.message);
   }
 };
+```
 
 NOTE
 The write function replaces the need to call the beginTransaction(), commitTransaction(), and cancelTransaction() methods.
 
-deleteTask
+### deleteTask
 
 Deleting objects must also take place within a transaction. As with modifying an object, we'll use the write() function to handle the transaction for us. We'll first call the objectForPrimaryKey method to get the specific we want to delete and then the delete() function on that task:
 
+```java
 exports.deleteTask = async (partition) => {
   const realm = await index.getRealm(partition);
   output.header("DELETE A TASK");
@@ -318,11 +331,13 @@ exports.deleteTask = async (partition) => {
     return;
   }
 };
+```
 
-modifyTask
+### modifyTask
 
 This function is called by both the editTask and changeStatus functions. Like the createTask and deleteTask methods, when you change an object, you do so within a transaction. Other than that, though, there is no specific call to a Realm API to change an object. Rather, you change the local object and Sync ensures the object is updated on the server.
 
+```java
 async function modifyTask(answers, partition) {
   const realm = await index.getRealm(partition);
   let task;
@@ -336,16 +351,18 @@ async function modifyTask(answers, partition) {
     return output.error(err.message);
   }
 }
+```
 
 NOTE
 To learn more about Realm Sync, see Sync Overview.
 
-In projects.js:
+### In projects.js:
 
-getProjects
+### getProjects
 
 As defined by our data model, projects are an embedded object of the users object. To get all projects the user is a part of, we need to get the current user. Then we'll use the refreshCustomData method to get the current user's memberOf property.
 
+```java
 async function getProjects() {
   const user = users.getAuthedUser();
   try {
@@ -360,6 +377,7 @@ async function getProjects() {
     output.error("There was a problem accessing custom user data");
   }
 }
+```
 
 NOTE
 How Do We Know Which Projects a User Can Access?
@@ -369,13 +387,14 @@ The backend is set up so that every user has read-only access to their own custo
 
 By managing the custom user data object entirely on the backend and only providing read-only access on the client side, we prevent a malicious client from granting themselves arbitrary permissions.
 
-G. Use Realm Functions
+## G. Use Realm Functions
 In the team.js file, there are functions that rely on Realm functions. Realm functions allow you to execute server-side logic for your client applications. Each of the following functions require you to implement the calls to Realm.
 
-getTeamMembers
+### getTeamMembers
 
 To get all team members, call the getMyTeamMembers Realm function using the User.functions method.
 
+```java
 exports.getTeamMembers = async () => {
   const currentUser = users.getAuthedUser();
   try {
@@ -385,11 +404,13 @@ exports.getTeamMembers = async () => {
     output.error(err.message);
   }
 };
+```
 
-addTeamMember
+### addTeamMember
 
 This function prompts the user for the email of the new team member. You will need to call the addTeamMember Realm function and pass it the email parameter.
 
+```java
 exports.addTeamMember = async () => {
   try {
     output.header("*** ADD A TEAM MEMBER ***");
@@ -407,11 +428,13 @@ exports.addTeamMember = async () => {
     output.error(err.message);
   }
 };
+```
 
-removeTeamMember
+### removeTeamMember
 
 This functions prompts the user for the email of the team member they would like to remove from their project. You will need to call the removeTeamMember Realm function and pass it the email parameter.
 
+```java
 exports.removeTeamMember = async () => {
   const currentUser = users.getAuthedUser();
   const teamMembers = await currentUser.functions.getMyTeamMembers();
@@ -434,6 +457,7 @@ exports.removeTeamMember = async () => {
     output.error(err.message);
   }
 };
+```
 
 ## H. Run and Test
 Once you have completed the code, you should run the app and check functionality.
@@ -441,25 +465,28 @@ Once you have completed the code, you should run the app and check functionality
 Open a terminal window and change to your app's directory.
 Run the following commands to install all of the dependencies and start the app:
 
+```java
 npm install
 node index.js
+```
 
 Your terminal window will clear and you will see the initial menu prompting you to log in or register as a new user:
 
-Initial menu
+### Initial menu
 If the app builds successfully, here are some things you can try in the app:
 
-Create a user with email first@example.com
-Explore the app, then log out.
-Start up the app again and register as another user with email second@example.com
-Select second@example.com's project
-Add, update, and remove some tasks
-Select the "Manage Team" menu option
-Add first@example.com to your team
-Log out and log in as first@example.com
-See two projects in the projects list
-Navigate to second@example.com's project
-Collaborate by adding, updating, and removing some new tasks
+- Create a user with email first@example.com
+- Explore the app, then log out.
+- Start up the app again and register as another user with email second@example.com
+- Select second@example.com's project
+- Add, update, and remove some tasks
+- Select the "Manage Team" menu option
+- Add first@example.com to your team
+- Log out and log in as first@example.com
+- See two projects in the projects list
+- Navigate to second@example.com's project
+- Collaborate by adding, updating, and removing some new tasks
+
 TIP
 If something isn't working for you, you can check out the final branch of this repo to compare your code with our finished solution.
 
@@ -468,17 +495,18 @@ You just built a functional task tracker web application built with MongoDB Real
 
 Now that you have some hands-on experience with MongoDB Realm, consider these options to keep practicing and learn more:
 
-Extend the task tracker app with additional features. For example, you could:
+- Extend the task tracker app with additional features. For example, you could:
 
-allow users to log in using another authentication provider
-Follow another tutorial to build a mobile app for the task tracker. We have task tracker tutorials for the following platforms:
+- allow users to log in using another authentication provider
+- Follow another tutorial to build a mobile app for the task tracker. We have task tracker tutorials for the following platforms:
 
-iOS (Swift)
-Android (Kotlin)
-React Native (JavaScript)
-Web with React and GraphQL (Javascript)
-Dive deeper into the docs to learn more about MongoDB Realm. You'll find information and guides on features like:
+  - iOS (Swift)
+  - Android (Kotlin)
+  - React Native (JavaScript)
+  - Web with React and GraphQL (Javascript)
+- Dive deeper into the docs to learn more about MongoDB Realm. You'll find information and guides on features like:
 
-Serverless functions that handle backend logic and connect your app to external services. You can call functions from a client app, either directly or as a custom GraphQL resolver.
-Triggers and HTTPS Endpoints, which automatically call functions in response to events as they occur. You can define database triggers which respond to changes in your data, authentication triggers which respond to user management and authentication events, and scheduled triggers which run on a fixed schedule.
-Built-in authentication providers and and user management tools. You can allow users to log in through multiple methods, like API keys and Google OAuth, and associate custom data with every user.
+  - Serverless functions that handle backend logic and connect your app to external services. You can call functions from a client app, either directly or as a custom GraphQL resolver.
+  - Triggers and HTTPS Endpoints, which automatically call functions in response to events as they occur. You can define database triggers which respond to changes in your data, authentication triggers which respond to user management and authentication events, and scheduled triggers which run on a fixed schedule.
+  - Built-in authentication providers and and user management tools. You can allow users to log in through multiple methods, like API keys and Google OAuth, and associate custom data with every user.
+
